@@ -1,0 +1,66 @@
+[
+  {
+    "name": "Simple real-time search",
+    "id": "project1"
+  },
+  {
+    "name": "Dynamic div generation",
+    "id": "project2"
+  },
+  {
+    "name": "Table Multi-Seach Tool",
+    "id": "project3"
+  },
+  {
+    "name": "Basic To-Do App",
+    "id": "project4"
+  },
+  {
+    "name": "A React Bar Chart",
+    "id": "project5"
+  },
+  {
+    "name": "Trending GIFs from Giphy",
+    "id": "project6"
+  },
+  {
+    "name": "Rendering HighCharts with React",
+    "id": "project7"
+  },
+  {
+    "name": "An Interactive Movement Interface",
+    "id": "project8"
+  },
+  {
+    "name": "A Basic Form Service",
+    "id": "project9"
+  },
+  {
+    "name": "Current Information From Space",
+    "id": "project10"
+  },
+  {
+    "name": "FCC Quote Generator",
+    "id": "project11"
+  },
+  {
+    "name": "FCC Weather App",
+    "id": "project12"
+  },
+  {
+    "name": "Wikipedia Viewer",
+    "id": "project13"
+  },
+  {
+    "name": "Twitch TV Api Viewer",
+    "id": "project14"
+  },
+  {
+    "name": "Javascript Calculator",
+    "id": "project15"
+  },
+  {
+    "name": "Pomodoro Clock",
+    "id": "project16"
+  }
+]
