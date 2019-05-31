@@ -2,6 +2,8 @@
 import { jsx, css, Global } from '@emotion/core';
 import styled from '@emotion/styled';
 import { useState } from 'react';
+import { CSSTransition } from 'react-transition-group';
+import { curry, evolve, not, reduce } from 'ramda';
 
 const GLOBAL_STYLE = css`
 body {
@@ -10,18 +12,32 @@ body {
   color: #D7D6D6;
   text-align: center;
 }
+`;
 
-h1 {
+const Elements = {};
+Elements.Title = styled.h1`
   font-size: 50px;
   font-weight: normal;
   color: #FF5E33;
-}
+`;
+Elements.ControlWrapper = styled.div``;
+Elements.Controls = styled.div`
+  max-width: 750px;
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  flex-wrap: wrap;
 
-.controlWrapper .allBtn {
-  margin-top: -25px;
-  margin-bottom: 15px;
-}
-.controlWrapper button {
+  hr {
+    margin-top: 25px;
+    margin-bottom: -45px;
+    width: 85vw;
+    border: 1px solid #F8F4A6;
+  }
+`;
+Elements.ControlButton = styled.button`
   width: 175px;
   font-size: 22px;
   padding: 10px;
@@ -30,235 +46,24 @@ h1 {
   border: none;
   border-Radius: 3px;
   box-shadow: none;
+  background: ${props => props.background || 'rgb(6, 255, 150)'};
   transition: color 150ms ease-in, background 100ms ease-in;
-}
-.controlWrapper button:hover {
-  cursor: pointer;
-  background: #06FF96 !important;
-  color: #FF5E33;
-  transition: color 150ms ease-in, background 100ms ease-in;
-}
-.controlWrapper button:focus {
-  outline: none;
-}
-.controlWrapper .controls {
-  max-width: 750px;
-  margin: auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: row;
-  flex-wrap: wrap;
-}
-.controlWrapper .controls hr {
-  margin-top: 25px;
-  margin-bottom: -45px;
-  width: 85vw;
-  border: 1px solid #F8F4A6;
-}
 
-.transitionsContainer {
+  &:hover {
+    cursor: pointer;
+    background: #06FF96 !important;
+    color: #FF5E33;
+    transition: color 150ms ease-in, background 100ms ease-in;    
+  }
 
-}
-
-.transitionBox {
-  border: 1px solid #F8F4A6;
-  transition: border 150ms ease-in;
-}
-
-.transitionBox:hover {
-  border: 1px solid #FF5E33;
-  transition: border 150ms ease-in;
-}
-
-.fadeDiv-enter {
-  opacity: 0.01;
-}
-
-.fadeDiv-enter.fadeDiv-enter-active {
-  opacity: 1;
-  transition: opacity 1000ms ease-in;
-}
-
-.fadeDiv-leave {
-  opacity: 1;
-}
-
-.fadeDiv-leave.fadeDiv-leave-active {
-  opacity: 0.01;
-  transition: opacity 1000ms ease-in;
-}
-
-.slideInDiv-enter {
-  transform: translate3d(600%, 0, 0);
-}
-
-.slideInDiv-enter.slideInDiv-enter-active {
-  transform: translate3d(0, 0, 0);
-  transition: transform 800ms ease-in;
-}
-
-.slideInDiv-leave {
-  transform: translate3d(0, 0, 0);
-}
-
-.slideInDiv-leave.slideInDiv-leave-active {
-  transform: translate3d(600%, 0, 0);
-  transition: transform 800ms ease-in;
-}
-
-.slideUpDiv-enter {
-  transform: translate3d(0, -300%, 0);
-}
-
-.slideUpDiv-enter.slideUpDiv-enter-active {
-  transform: translate3d(0, 0, 0);
-  transition: transform 800ms ease-in;
-}
-
-.slideUpDiv-leave {
-  transform: translate3d(0, 0, 0);
-}
-
-.slideUpDiv-leave.slideUpDiv-leave-active {
-  transform: translate3d(0, -300%, 0);
-  transition: transform 800ms ease-in;
-}
-
-.sliderDiv-enter {
-  transform: translate3d(-1000%, -300%, 0);
-}
-
-.sliderDiv-enter.sliderDiv-enter-active {
-  transform: translate3d(0, 0, 0);
-  transition: transform 1000ms ease-in;
-}
-
-.sliderDiv-leave {
-  transform: translate3d(0, 0, 0);
-}
-
-.sliderDiv-leave.sliderDiv-leave-active {
-  transform: translate3d(-1000%, 300%, 0);
-  transition: transform 1000ms ease-in;
-}
-
-.heightInDiv-enter {
-  max-height: 0;
-}
-
-.heightInDiv-enter.heightInDiv-enter-active {
-  max-height: 150px;
-  transition: max-height 1000ms ease-in;
-}
-
-.heightInDiv-leave {
-  max-height: 150px;
-}
-
-.heightInDiv-leave.heightInDiv-leave-active {
-  max-height: 0;
-  transition: max-height 1000ms ease-in;
-}
-
-.widthInDiv-enter {
-  max-width: 0;
-}
-
-.widthInDiv-enter.widthInDiv-enter-active {
-  max-width: 150px;
-  transition: max-width 750ms ease-in;
-}
-
-.widthInDiv-leave {
-  max-width: 150px;
-}
-
-.widthInDiv-leave.widthInDiv-leave-active {
-  max-width: 0;
-  transition: max-width 1000ms ease-in;
-}
-
-.widthInTextBefore {
-  color: transparent;
-  transition: color 250ms ease-out;
-}
-
-.widthInTextAfter {
-  color: #000000;
-  transition: color 2500ms ease-out;
-  transition-delay: .75s;
-}
-
-.sizeInDiv-enter {
-  max-width: 0;
-  max-height: 0;
-}
-
-.sizeInDiv-enter.sizeInDiv-enter-active {
-  max-width: 150px;
-  max-height: 150px;
-  transition: max-width 650ms ease-in, max-height 750ms ease-in;
-}
-
-.sizeInDiv-leave {
-  max-width: 150px;
-  max-height: 150px;
-}
-
-.sizeInDiv-leave.sizeInDiv-leave-active {
-  max-width: 0;
-  max-height: 0;
-  transition: max-width 1000ms ease-in, max-height 1000ms ease-in;
-}
-
-.sizeTextBefore {
-  color: transparent;
-  transition: color 250ms linear;
-}
-
-.sizeTextAfter {
-  color: #F0EBD8;
-  transition: color 2500ms linear;
-  transition-delay: .75s;
-}
-
-.rotateInDiv-enter {
-  transform: rotate(720deg);
-  opacity: 0.01;
-}
-
-.rotateInDiv-enter.rotateInDiv-enter-active {
-  transform: rotate(0deg);
-  opacity: 1;
-  transition: transform 1000ms ease-in, opacity 1000ms ease-in;
-}
-
-.rotateInDiv-leave {
-  transform: rotate(0deg);
-  opacity: 1;
-}
-
-.rotateInDiv-leave.rotateInDiv-leave-active {
-  transform: rotate(720deg);
-  opacity: 0.01;
-  transition: transform 1500ms ease-in, opacity 1500ms ease-in;
-}
-
-.rotateTextBefore {
-  color: transparent;
-  transition: color 1000ms ease-in;
-}
-
-.rotateTextAfter {
-  color: #FF3F00;
-  transition: color 1000ms ease-in;
-  transition-delay: .05s;
-}
+  &:focus {
+    outline: none;
+  }
 `;
-
-const Elements = {};
-Elements.ControlWrapper = styled.div``;
+Elements.AllButton = styled(Elements.ControlButton)`
+  margin-top: -25px;
+  margin-bottom: 15px;
+`;
 Elements.TransitionsContainer =styled.div`
   padding: 50px;
   color: #141414;
@@ -268,31 +73,246 @@ Elements.TransitionsContainer =styled.div`
   flex-direction: row;
   flex-wrap: wrap;
 `;
-Elements.TransitionBlock = styled.div`
-width: 150px;
-    height: 150px;
-    padding: 10px;
-    margin: 25px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 22px;
-    font-family: Avenir;
-    font-weight: bold;
-    cursor: pointer;
-    border-radius: 5px;
-    color: rgb(25, 25, 25);
-    background: ${props => props.bg || 'rgb(192, 53, 70)'};
+Elements.TransitionBlock = styled(({activeCss, background, ...props}) => <CSSTransition {...props} />)`
+  border: 1px solid #F8F4A6;
+  transition: border 150ms ease-in;
+  width: 150px;
+  height: 150px;
+  padding: 10px;
+  margin: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 22px;
+  font-family: Avenir;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 5px;
+  color: ${({color}) => color || 'rgb(25, 25, 25)'};
+  background: ${({background}) => background || 'rgb(192, 53, 70)'};
+
+  &:hover {
+    border: 1px solid #FF5E33;
+    transition: border-color 150ms ease-in;
+  }
+
+  &.${({classNames}) => `${classNames}-enter`} {
+    ${({css}) => css};
+  }
+
+  &.${({classNames}) => `${classNames}-enter-active`} {
+    ${({activeCss}) => activeCss};
+  }
+
+  &.${({classNames}) => `${classNames}-enter-done`} {
+    display: none;
+  }
+
+  &.${({classNames}) => `${classNames}-exit`} {
+    ${({activeCss}) => activeCss};
+  }
+
+  &.${({classNames}) => `${classNames}-exit-active`} {
+    ${({css}) => css};
+  }
 `;
 
+const ACTIVE_BUTTON_BG = 'rgb(253, 214, 146)';
+
+const TRANSITIONS = [
+  {
+    key: 'fadeOut',
+    buttonText: 'Fade Out',
+    buttonActiveText: 'Fade In',
+    duration: 1000,
+    css: css`
+      transition: opacity 1000ms ease-in;
+      opacity: 1.0;
+    `,
+    activeCss: css`
+      transition: opacity 1000ms ease-in;
+      opacity: 0;
+    `,
+    divText: 'This div fades in and out'
+  },
+  {
+    key: 'slideIn',
+    buttonText: 'Slide Out Right',
+    buttonActiveText: 'Slide In Left',
+    duration: 800,
+    css: css`
+      transition: transform 800ms ease-in;
+      transform: translate3d(0, 0, 0);
+    `,
+    activeCss: css`
+      transition: transform 800ms ease-in;
+      transform: translate3d(700%, 0, 0);
+    `,
+    divText: 'This div slides in and out',
+    background: 'rgb(0, 78, 102)'
+  },
+  {
+    key: 'slideUp',
+    buttonText: 'Slide Out Up',
+    buttonActiveText: 'Slide In Down',
+    duration: 800,
+    css: css`
+      transition: transform 800ms ease-in;
+      transform: translate3d(0, 0, 0);
+    `,
+    activeCss: css`
+      transition: transform 800ms ease-in;
+      transform: translate3d(0, -400%, 0);
+    `,
+    divText: 'This div slides up and down',
+    background: 'rgb(248, 202, 0)'
+  },
+  {
+    key: 'slider',
+    buttonText: 'Slider Out',
+    buttonActiveText: 'Slider In',
+    duration: 1000,
+    css: css`
+      transition: transform 1000ms ease-in;
+      transform: translate3d(0, 0, 0);
+    `,
+    activeCss: css`
+      transition: transform 1000ms ease-in;
+      transform: translate3d(-1000%, 300%, 0);
+    `,
+    divText: 'This div slides around',
+    background: 'rgb(52, 138, 167)'
+  },
+  {
+    key: 'height',
+    buttonText: 'Height In',
+    buttonActiveText: 'Height Out',
+    duration: 1000,
+    css: css`
+      transition: transform 1000ms ease-in;
+      transform: scaleY(1);
+    `,
+    activeCss: css`
+      transition: transform 1000ms ease-in;
+      transform: scaleY(0);
+      transform-origin: center;
+    `,
+    divText: 'This button grows and squishes',
+    background: 'rgb(191, 78, 48)'
+  },
+  {
+    key: 'width',
+    buttonText: 'Width In',
+    buttonActiveText: 'Width Out',
+    duration: 1000,
+    css: css`
+      transition: transform 1000ms ease-in, color 1000ms ease-in;
+      transform: scaleX(1);
+      color: inherit;
+    `,
+    activeCss: css`
+      transition: transform 1000ms ease-in, color 1000ms ease-in;
+      transform: scaleX(0);
+      transform-origin: center;
+      color: transparent;
+    `,
+    divText: 'This div expands and squeezes (with fade in text!)',
+    background: 'rgb(237, 49, 127)'
+  },
+  {
+    key: 'size',
+    buttonText: 'Size In',
+    buttonActiveText: 'Size Out',
+    duration: 1000,
+    css: css`
+      transition: transform 1000ms ease-in, color 1000ms ease-in;
+      transform: scale(1);
+      color: #F0EBD8;
+    `,
+    activeCss: css`
+      transition: transform 1000ms ease-in, color 1000ms ease-in;
+      transform: scale(0);
+      transform-origin: center;
+      color: transparent;
+    `,
+    divText: 'This div expands and contracts (with fade in text!)',
+    background: 'rgb(29, 45, 68)'
+  },
+  {
+    key: 'rotate',
+    buttonText: 'Rotate In',
+    buttonActiveText: 'Rotate Out',
+    duration: 1000,
+    css: css`
+      transition: transform 1000ms ease-in, opacity 1000ms ease-in, color 1000ms ease-in;
+      transform: rotate(0);
+      opacity: 1.0;
+      color: #FF3F00;
+    `,
+    activeCss: css`
+      transition: transform 1000ms ease-in, opacity 1000ms ease-in, color 1000ms ease-in;
+      transform: rotate(720deg);
+      opacity: 0;
+      color: transparent;
+    `,
+    divText: 'This div rotates!',
+    background: 'rgb(91, 55, 88)'
+  }
+]
+
+const makeAllState = curry((value, transitions) => reduce((obj, transition) => ({ ...obj, [transition.key]: value }), {}, transitions));
+
 const Project20 = () => {
-  
+  const [state, setState] = useState(makeAllState(false, TRANSITIONS));
+ const [all, setAll] = useState(false);
+
+  const evolver = key => evolve({
+    [key]: not
+  })
+
+  const onClick = key => () => {
+    setState(evolver(key));
+  };
+
+  const toggleAll = () => {
+    setState(makeAllState(!all, TRANSITIONS));
+    setAll(!all);
+  };
+
   return (
     <div>
       <Global styles={GLOBAL_STYLE} />
-      <Elements.ControlWrapper></Elements.ControlWrapper>
+      <Elements.Title>React CSS Transitions</Elements.Title>
+      <Elements.ControlWrapper>
+        <Elements.AllButton onClick={toggleAll}>Toggle All {all ? 'On' : 'Off'}</Elements.AllButton>
+        <Elements.Controls>
+          {TRANSITIONS.map(transition => (
+            <Elements.ControlButton
+              key={transition.key}
+              onClick={onClick(transition.key)}
+              background={state[transition.key] ? ACTIVE_BUTTON_BG : undefined }
+            >
+              { !state[transition.key] ? transition.buttonText : transition.buttonActiveText }
+            </Elements.ControlButton>
+          ))}
+          <hr/>
+        </Elements.Controls>
+      </Elements.ControlWrapper>
       <Elements.TransitionsContainer>
-
+        {TRANSITIONS.map(transition => 
+          (<Elements.TransitionBlock
+            key={transition.key}
+            classNames={transition.key}
+            in={state[transition.key]}
+            timeout={transition.duration}
+            onClick={onClick(transition.key)}
+            css={transition.css}
+            activeCss={transition.activeCss}
+            background={transition.background}
+          >
+            <div>{transition.divText}</div>
+          </Elements.TransitionBlock>)
+        )}
       </Elements.TransitionsContainer>
     </div>
   );
