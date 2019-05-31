@@ -66,5 +66,9 @@
   {
     "name": "CSS Transitions",
     "id": "project20"
+  },
+  {
+    "name": "Transition Test",
+    "id": "test"
   }
 ]

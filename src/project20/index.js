@@ -264,7 +264,7 @@ const makeAllState = curry((value, transitions) => reduce((obj, transition) => (
 
 const Project20 = () => {
   const [state, setState] = useState(makeAllState(false, TRANSITIONS));
- const [all, setAll] = useState(false);
+  const [all, setAll] = useState(false);
 
   const evolver = key => evolve({
     [key]: not
