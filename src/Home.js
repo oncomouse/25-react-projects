@@ -2,6 +2,7 @@ import React from 'react';
 import styled from '@emotion/styled';
 import { Link } from 'react-router-dom';
 import { Global, css } from '@emotion/core';
+import { match } from 'ramda';
 import projects from './projects.json';
 import logo from './logo.svg';
 
@@ -119,12 +120,16 @@ const Projects = () => {
       <h1>The Projects</h1>
       <table>
         <tbody>
-          {projects.map((project, i) => (
-            <tr key={i}>
-              <Cell left={true}>Project {i + 1}:</Cell>
-              <Cell left={false}><Link to={`/projects/${project.id}`}>{project.name}</Link></Cell>
-            </tr>
-          ))}
+          {projects.map((project, i) => {
+            const number = parseInt(match(/([0-9]+)$/, project.id), 10);
+            if(isNaN(number)) { return null }
+            return (
+              <tr key={i}>
+                <Cell left={true}>Project {number}:</Cell>
+                <Cell left={false}><Link to={`/projects/${project.id}`}>{project.name}</Link></Cell>
+              </tr>
+            )
+          })}
         </tbody>
       </table>
     </ProjectsContainer>
