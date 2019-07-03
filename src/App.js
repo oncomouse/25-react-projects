@@ -14,6 +14,7 @@ const Loading = (
     right: 0;
     bottom: 0;
     padding: 55px 35px;
+    
     .ellipsis {
       color: rgb(114, 223, 250);
     }
