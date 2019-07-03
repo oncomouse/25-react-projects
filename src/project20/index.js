@@ -2,7 +2,7 @@
 import { jsx, css, Global } from '@emotion/core';
 import styled from '@emotion/styled';
 import { useState } from 'react';
-import { CSSTransition } from 'react-transition-group';
+import StyledTransition from '../utilities/StyledTransition';
 import { curry, evolve, not, reduce } from 'ramda';
 
 const GLOBAL_STYLE = css`
@@ -73,9 +73,8 @@ Elements.TransitionsContainer =styled.div`
   flex-direction: row;
   flex-wrap: wrap;
 `;
-Elements.TransitionBlock = styled(({activeCss, background, ...props}) => <CSSTransition {...props} />)`
+Elements.TransitionBlock = styled(StyledTransition)`
   border: 1px solid #F8F4A6;
-  transition: border 150ms ease-in;
   width: 150px;
   height: 150px;
   padding: 10px;
@@ -95,26 +94,6 @@ Elements.TransitionBlock = styled(({activeCss, background, ...props}) => <CSSTra
     border: 1px solid #FF5E33;
     transition: border-color 150ms ease-in;
   }
-
-  &.${({classNames}) => `${classNames}-enter`} {
-    ${({css}) => css};
-  }
-
-  &.${({classNames}) => `${classNames}-enter-active`} {
-    ${({activeCss}) => activeCss};
-  }
-
-  &.${({classNames}) => `${classNames}-enter-done`} {
-    display: none;
-  }
-
-  &.${({classNames}) => `${classNames}-exit`} {
-    ${({activeCss}) => activeCss};
-  }
-
-  &.${({classNames}) => `${classNames}-exit-active`} {
-    ${({css}) => css};
-  }
 `;
 
 const ACTIVE_BUTTON_BG = 'rgb(253, 214, 146)';
@@ -125,14 +104,27 @@ const TRANSITIONS = [
     buttonText: 'Fade Out',
     buttonActiveText: 'Fade In',
     duration: 1000,
-    css: css`
-      transition: opacity 1000ms ease-in;
-      opacity: 1.0;
-    `,
-    activeCss: css`
-      transition: opacity 1000ms ease-in;
-      opacity: 0;
-    `,
+    css: {
+      enter: css`
+        transition: opacity 1000ms ease-in;
+        opacity: 1.0;
+      `,
+      enterActive: css`
+        transition: opacity 1000ms ease-in;
+        opacity: 0;
+      `,
+      enterDone: css`
+        display: none;
+      `,
+      exit: css`
+        transition: opacity 1000ms ease-in;
+        opacity: 0;
+      `,
+      exitActive: css`
+        transition: opacity 1000ms ease-in;
+        opacity: 1.0;
+      `
+    },
     divText: 'This div fades in and out'
   },
   {
@@ -140,14 +132,25 @@ const TRANSITIONS = [
     buttonText: 'Slide Out Right',
     buttonActiveText: 'Slide In Left',
     duration: 800,
-    css: css`
-      transition: transform 800ms ease-in;
-      transform: translate3d(0, 0, 0);
-    `,
-    activeCss: css`
-      transition: transform 800ms ease-in;
-      transform: translate3d(700%, 0, 0);
-    `,
+    css: {
+      enter: css`
+        transform: translate3d(0, 0, 0);
+      `,
+      enterActive: css`
+        transition: transform 800ms ease-in;
+        transform: translate3d(700%, 0, 0);
+      `,
+      enterDone: css`
+        display: none;
+      `,
+      exit: css`
+        transform: translate3d(700%, 0, 0);
+      `,
+      exitActive: css`
+        transition: transform 800ms ease-in;
+        transform: translate3d(0, 0, 0);
+      `
+    },
     divText: 'This div slides in and out',
     background: 'rgb(0, 78, 102)'
   },
@@ -156,14 +159,25 @@ const TRANSITIONS = [
     buttonText: 'Slide Out Up',
     buttonActiveText: 'Slide In Down',
     duration: 800,
-    css: css`
-      transition: transform 800ms ease-in;
-      transform: translate3d(0, 0, 0);
-    `,
-    activeCss: css`
-      transition: transform 800ms ease-in;
-      transform: translate3d(0, -400%, 0);
-    `,
+    css: {
+      enter: css`
+        transform: translate3d(0, 0, 0);
+      `,
+      enterActive: css`
+        transition: transform 800ms ease-in;
+        transform: translate3d(0, -400%, 0);
+      `,
+      enterDone: css`
+        display: none;
+      `,
+      exit: css`
+        transform: translate3d(0, -400%, 0);
+      `,
+      exitActive: css`
+        transition: transform 800ms ease-in;
+        transform: translate3d(0, 0, 0);
+      `
+    },
     divText: 'This div slides up and down',
     background: 'rgb(248, 202, 0)'
   },
@@ -172,14 +186,25 @@ const TRANSITIONS = [
     buttonText: 'Slider Out',
     buttonActiveText: 'Slider In',
     duration: 1000,
-    css: css`
-      transition: transform 1000ms ease-in;
-      transform: translate3d(0, 0, 0);
-    `,
-    activeCss: css`
-      transition: transform 1000ms ease-in;
-      transform: translate3d(-1000%, 300%, 0);
-    `,
+    css: {
+      enter: css`
+        transform: translate3d(0, 0, 0);
+      `,
+      enterActive: css`
+        transition: transform 800ms ease-in;
+        transform: translate3d(-1000%, 300%, 0);
+      `,
+      enterDone: css`
+        display: none;
+      `,
+      exit: css`
+        transform: translate3d(-1000%, 300%, 0);
+      `,
+      exitActive: css`
+        transition: transform 800ms ease-in;
+        transform: translate3d(0, 0, 0);
+      `
+    },
     divText: 'This div slides around',
     background: 'rgb(52, 138, 167)'
   },
@@ -188,15 +213,25 @@ const TRANSITIONS = [
     buttonText: 'Height In',
     buttonActiveText: 'Height Out',
     duration: 1000,
-    css: css`
-      transition: transform 1000ms ease-in;
-      transform: scaleY(1);
-    `,
-    activeCss: css`
-      transition: transform 1000ms ease-in;
-      transform: scaleY(0);
-      transform-origin: center;
-    `,
+    css: {
+      enter: css`
+        transform: scaleY(1);
+      `,
+      enterActive: css`
+        transition: transform 1000ms ease-in;
+        transform: scaleY(0);
+      `,
+      enterDone: css`
+        display: none;
+      `,
+      exit: css`
+        transform: scaleY(0);
+      `,
+      exitActive: css`
+        transition: transform 800ms ease-in;
+        transform: scaleY(1);
+      `
+    },
     divText: 'This button grows and squishes',
     background: 'rgb(191, 78, 48)'
   },
@@ -205,17 +240,29 @@ const TRANSITIONS = [
     buttonText: 'Width In',
     buttonActiveText: 'Width Out',
     duration: 1000,
-    css: css`
-      transition: transform 1000ms ease-in, color 1000ms ease-in;
-      transform: scaleX(1);
-      color: inherit;
-    `,
-    activeCss: css`
-      transition: transform 1000ms ease-in, color 1000ms ease-in;
-      transform: scaleX(0);
-      transform-origin: center;
-      color: transparent;
-    `,
+    css: {
+      enter: css`
+        transform: scaleX(1);
+        color: inherit;
+      `,
+      enterActive: css`
+        transition: transform 1000ms ease-in, color 1000ms ease-in;
+        transform: scaleX(0);
+        color: transparent;
+      `,
+      enterDone: css`
+        display: none;
+      `,
+      exit: css`
+        transform: scaleX(0);
+        color: transparent;
+      `,
+      exitActive: css`
+        transition: transform 1000ms ease-in, color 1000ms ease-in;
+        transform: scaleX(1);
+        color: inherit;
+      `
+    },
     divText: 'This div expands and squeezes (with fade in text!)',
     background: 'rgb(237, 49, 127)'
   },
@@ -224,38 +271,67 @@ const TRANSITIONS = [
     buttonText: 'Size In',
     buttonActiveText: 'Size Out',
     duration: 1000,
-    css: css`
-      transition: transform 1000ms ease-in, color 1000ms ease-in;
-      transform: scale(1);
-      color: #F0EBD8;
-    `,
-    activeCss: css`
-      transition: transform 1000ms ease-in, color 1000ms ease-in;
-      transform: scale(0);
-      transform-origin: center;
-      color: transparent;
-    `,
+    css: {
+      enter: css`
+        transform: scale(1);
+      `,
+      enterActive: css`
+        transition: transform 1000ms ease-in, color 1000ms ease-in;
+        transform: scale(0);
+        transform-origin: center;
+        color: transparent;
+      `,
+      enterDone: css`
+        display: none;
+      `,
+      exit: css`
+        transform: scale(0);
+        transform-origin: center;
+        color: transparent;
+      `,
+      exitActive: css`
+        transition: transform 1000ms ease-in, color 1000ms ease-in;
+        transform: scale(1);
+        color: #F0EBD8;
+      `
+    },
     divText: 'This div expands and contracts (with fade in text!)',
-    background: 'rgb(29, 45, 68)'
+    background: 'rgb(29, 45, 68)',
+    color: '#F0EBD8'
   },
   {
     key: 'rotate',
     buttonText: 'Rotate In',
     buttonActiveText: 'Rotate Out',
     duration: 1000,
-    css: css`
-      transition: transform 1000ms ease-in, opacity 1000ms ease-in, color 1000ms ease-in;
-      transform: rotate(0);
-      opacity: 1.0;
-      color: #FF3F00;
-    `,
-    activeCss: css`
-      transition: transform 1000ms ease-in, opacity 1000ms ease-in, color 1000ms ease-in;
-      transform: rotate(720deg);
-      opacity: 0;
-      color: transparent;
-    `,
+    css: {
+      enter: css`
+        transform: rotate(0);
+        opacity: 1.0;
+      `,
+      enterActive: css`
+        transition: transform 1000ms ease-in, opacity 1000ms ease-in, color 1000ms ease-in;
+        opacity: 0.0;
+        transform: rotate(720deg);
+        color: transparent;
+      `,
+      enterDone: css`
+        display: none;
+      `,
+      exit: css`
+        opacity: 0.0;
+        transform: rotate(720deg);
+        color: transparent;
+      `,
+      exitActive: css`
+        transition: transform 1000ms ease-in, opacity 1000ms ease-in, color 1000ms ease-in;
+        transform: rotate(0);
+        opacity: 1.0;
+        color: #FF3F00;
+      `
+    },
     divText: 'This div rotates!',
+    color: '#FF3F00',
     background: 'rgb(91, 55, 88)'
   }
 ]
@@ -302,13 +378,12 @@ const Project20 = () => {
         {TRANSITIONS.map(transition => 
           (<Elements.TransitionBlock
             key={transition.key}
-            classNames={transition.key}
             in={state[transition.key]}
             timeout={transition.duration}
             onClick={onClick(transition.key)}
-            css={transition.css}
-            activeCss={transition.activeCss}
+            transitions={transition.css}
             background={transition.background}
+            color={transition.color}
           >
             <div>{transition.divText}</div>
           </Elements.TransitionBlock>)

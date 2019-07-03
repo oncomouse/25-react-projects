@@ -27,7 +27,7 @@ const Test = () => {
             transition: opacity 250ms ease-in;
           `,
           enterDone: css`
-            opacity: 0.0;
+            opacity: 0;
           `,
           exit: css`
             opacity: 0;

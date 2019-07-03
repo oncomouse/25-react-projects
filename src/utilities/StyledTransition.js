@@ -22,7 +22,7 @@ const StyledTransition = styled(({ transitions, className, ...props }) => <CSSTr
     const objectKey = keyframe.replace(/(-[a-z])/, v => v.slice(1).toUpperCase());
     if (has(objectKey, transitions)) {
       return [...styles, css`
-        &-${keyframe} {
+        &&-${keyframe} {
           ${transitions[objectKey]}
         }
       `];
