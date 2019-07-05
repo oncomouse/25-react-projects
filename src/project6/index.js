@@ -2,7 +2,7 @@
 import { useState, memo } from 'react';
 import { Global, css, jsx } from '@emotion/core';
 import styled from '@emotion/styled';
-import { compose, map, path, prop, reverse } from 'ramda';
+import { compose, composeWith, map, path, prop, reverse, then } from 'ramda';
 
 function shuffle(array) {
   let counter = array.length;
@@ -61,17 +61,18 @@ const Project6 = memo(() => {
   const getGifs = ev => {
     ev.preventDefault();
 
-    fetch('https://api.giphy.com/v1/gifs/trending?api_key=EJCv76s5lESrvAoZVkE90HI2vFpDDXuG&limit=25&rating=G')
-      .then(response => response.json())
-      //.then(data => data.data.map(image => image.images.fixed_height.url))
-      .then(compose(
-        map(path(['images', 'fixed_height', 'url'])),
-        prop('data')
-      ))
-      .then(gifs => {
+    composeWith(then, [
+      gifs => {
         setGifs([...gifs]);
         setFiltered([...gifs]);
-      })
+      },
+      compose(
+        map(path(['images', 'fixed_height', 'url'])),
+        prop('data')
+      ),
+      response => response.json(),
+      fetch
+    ])('https://api.giphy.com/v1/gifs/trending?api_key=EJCv76s5lESrvAoZVkE90HI2vFpDDXuG&limit=25&rating=G')
   }
   const getRandom = () => setFiltered([sample(gifs)]);
   const randomOrder = () => setFiltered(shuffle);

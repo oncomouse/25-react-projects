@@ -2,7 +2,7 @@
 import { jsx, css, Global } from '@emotion/core';
 import styled from '@emotion/styled';
 import { useState, useEffect } from 'react';
-import { T, always, tap, compose, cond, equals, or, prop } from 'ramda';
+import { T, always, tap, compose, composeWith, cond, equals, or, prop, then } from 'ramda';
 
 const GLOBAL_STYLE = css`
 @import url("https://fonts.googleapis.com/css?family=Montserrat");
@@ -95,7 +95,7 @@ StyledElements.Credits = styled.p`
     color: #c8c8c8;
     text-decoration: none;
   }
-  
+
   a:hover {
     color: #f94e3f;
     text-decoration: underline;
@@ -117,31 +117,34 @@ const Project12 = () => {
   const [tempFilter, setTempFilter] = useState(FILTERS.K);
 
   useEffect(() => {
-    fetch('http://ip-api.com/json')
-      .then(response => response.json())
-      .then(tap(console.log))
-      .then(setLocation)
+    composeWith(then, [
+      setLocation,
+      response => response.json(),
+      fetch
+    ])('http://ip-api.com/json')
   }, [])
 
   useEffect(() => {
     const keyID = 'e75aa9eb22e3e903ba187251f2faa34f';
     if (location !== null) {
-      fetch(`http://api.openweathermap.org/data/2.5/weather?lat=${location.lat}&lon=${location.lon}&appid=${keyID}`)
-        .then(response => response.json())
-        .then(response => {
-          const tempK = response.main.temp.toFixed(1);
-          const tempC = k2c(tempK);
-          const tempF = c2f(tempC);
-          return setWeather({
-            tempK,
-            tempC,
-            tempF,
-            weather: {
-              main: response.weather[0].main,
-              detail: response.weather[0].description
-            }
-          })
-        })
+      composeWith(then, [
+        ({ main, detail, tempK }) => setWeather({
+          tempK: tempK,
+          tempC: k2c(tempK),
+          tempF: compose(c2f, k2c)(tempK),
+          weather: {
+            main,
+            detail
+          }
+        }),
+        response => ({
+          main: response.weather[0].main,
+          detail: response.weather[0].description,
+          tempK: response.main.temp.toFixed(1)
+        }),
+        response => response.json(),
+        fetch
+      ])(`http://api.openweathermap.org/data/2.5/weather?lat=${location.lat}&lon=${location.lon}&appid=${keyID}`)
     }
   }, [location])
 
